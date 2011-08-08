@@ -3,10 +3,10 @@
   { "keys": ["super+x"], "command": "clipboard_history_cut" },
   { "keys": ["super+c"], "command": "clipboard_history_copy" },
   { "keys": ["super+v"], "command": "clipboard_history_paste" },
-  { "keys": ["super+shift+v"], "command": "clipboard_history_paste_and_previous" },
+  { "keys": ["super+shift+v"], "command": "clipboard_history_previous_and_paste" },
 
   { "keys": ["super+pagedown"], "command": "clipboard_history_next" },
   { "keys": ["super+pageup"], "command": "clipboard_history_previous" },
-  { "keys": ["super+alt+ctrl+v"], "command": "clipboard_history_visualize" }
+  { "keys": ["super+alt+ctrl+v"], "command": "clipboard_history_choose_and_paste" }
 
 ]
