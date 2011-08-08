@@ -101,5 +101,9 @@ class ClipboardHistoryChooseAndPaste(ClipboardHistoryBase):
                     _HISTORY.index = idx
                     self.update_clipboard(_HISTORY.current())
             self.view.run_command('paste')
+        
+        def format(line):
+            return line.replace('\n', '$ ')[:64]
 
-        sublime.active_window().show_quick_panel(_HISTORY, on_done)
+        lines = map(format, _HISTORY)
+        sublime.active_window().show_quick_panel(lines, on_done)
