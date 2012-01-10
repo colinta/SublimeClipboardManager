@@ -38,6 +38,7 @@ _HISTORY = HistoryList()
 class ClipboardHistoryBase(sublime_plugin.TextCommand):
 
     def update_clipboard(self, content):
+        sublime.status_message("Set Clipboard to " + content)
         sublime.set_clipboard(content)
 
     def next(self):
