@@ -62,16 +62,13 @@ class ClipboardHistoryBase(sublime_plugin.TextCommand):
 
 
 class ClipboardHistoryPaste(ClipboardHistoryBase):
-    def run(self, edit):
+    def run(self, edit, indent=False):
         # If the user pastes something that was copied in a different program, it will not be in sublime's buffer, so we attempt to append every time
         self.appendClipboard()
-        self.view.run_command('paste')
-
-
-class ClipboardHistoryPasteAndIndent(ClipboardHistoryBase):
-    def run(self, edit):
-        self.appendClipboard()
-        self.view.run_command('paste_and_indent')
+        if indent:
+            self.view.run_command('paste_and_indent')
+        else:
+            self.view.run_command('paste')
 
 
 class ClipboardHistoryCut(ClipboardHistoryBase):
@@ -99,9 +96,12 @@ class ClipboardHistoryPrevious(ClipboardHistoryBase):
 
 
 class ClipboardHistoryPreviousAndPaste(ClipboardHistoryBase):
-    def run(self, edit):
+    def run(self, edit, indent=False):
         self.previous()
-        self.view.run_command('paste')
+        if indent:
+            self.view.run_command('paste_and_indent')
+        else:
+            self.view.run_command('paste')
 
 
 class ClipboardHistoryChooseAndPaste(ClipboardHistoryBase):
