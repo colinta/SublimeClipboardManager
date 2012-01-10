@@ -90,6 +90,15 @@ class ClipboardHistoryNext(ClipboardHistoryBase):
         self.next()
 
 
+class ClipboardHistoryNextAndPaste(ClipboardHistoryBase):
+    def run(self, edit, indent=False):
+        self.next()
+        if indent:
+            self.view.run_command('paste_and_indent')
+        else:
+            self.view.run_command('paste')
+
+
 class ClipboardHistoryPrevious(ClipboardHistoryBase):
     def run(self, edit):
         self.previous()
