@@ -115,13 +115,12 @@ class ClipboardHistoryPreviousAndPaste(ClipboardHistoryBase):
 
 class ClipboardHistoryChooseAndPaste(ClipboardHistoryBase):
     def run(self, edit):
-
         def on_done(idx):
             if idx >= 0:
                 with _LOCK:
                     _HISTORY.index = idx
                     self.update_clipboard(_HISTORY.current())
-            self.view.run_command('paste')
+                self.view.run_command('paste')
 
         def format(line):
             return line.replace('\n', '$ ')[:64]
