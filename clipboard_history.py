@@ -1,4 +1,3 @@
-import threading
 import sublime
 import sublime_plugin
 
@@ -31,8 +30,7 @@ class HistoryList(list):
         if self.index < len(self) - 1:
             self.index += 1
 
-_LOCK = threading.RLock()
-_HISTORY = HistoryList()
+HISTORY = HistoryList()
 
 
 class ClipboardHistoryBase(sublime_plugin.TextCommand):
@@ -42,23 +40,20 @@ class ClipboardHistoryBase(sublime_plugin.TextCommand):
         sublime.set_clipboard(content)
 
     def next(self):
-        with _LOCK:
-            _HISTORY.next()
-            self.update_clipboard(_HISTORY.current())
+        HISTORY.next()
+        self.update_clipboard(HISTORY.current())
 
     def previous(self):
-        with _LOCK:
-            _HISTORY.previous()
-            self.update_clipboard(_HISTORY.current())
+        HISTORY.previous()
+        self.update_clipboard(HISTORY.current())
 
     def appendClipboard(self):
-        with _LOCK:
-            # append the contents of the clipboard to the history if it is unique
-            if not self.onCurrent():
-                _HISTORY.append(sublime.get_clipboard())
+        # append the contents of the clipboard to the history if it is unique
+        if not self.onCurrent():
+            HISTORY.append(sublime.get_clipboard())
 
     def onCurrent(self):
-        return sublime.get_clipboard() == _HISTORY.current()
+        return sublime.get_clipboard() == HISTORY.current()
 
 
 class ClipboardHistoryPaste(ClipboardHistoryBase):
@@ -117,13 +112,12 @@ class ClipboardHistoryChooseAndPaste(ClipboardHistoryBase):
     def run(self, edit):
         def on_done(idx):
             if idx >= 0:
-                with _LOCK:
-                    _HISTORY.index = idx
-                    self.update_clipboard(_HISTORY.current())
+                HISTORY.index = idx
+                self.update_clipboard(HISTORY.current())
                 self.view.run_command('paste')
 
         def format(line):
             return line.replace('\n', '$ ')[:64]
 
-        lines = map(format, _HISTORY)
+        lines = map(format, HISTORY)
         sublime.active_window().show_quick_panel(lines, on_done)
