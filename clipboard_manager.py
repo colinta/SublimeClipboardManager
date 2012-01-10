@@ -36,7 +36,7 @@ HISTORY = HistoryList()
 class ClipboardManagerBase(sublime_plugin.TextCommand):
 
     def update_clipboard(self, content):
-        sublime.status_message("Set Clipboard to " + content)
+        sublime.status_message('Set Clipboard to "' + content + '"')
         sublime.set_clipboard(content)
 
     def next(self):
@@ -120,4 +120,7 @@ class ClipboardManagerChooseAndPaste(ClipboardManagerBase):
             return line.replace('\n', '$ ')[:64]
 
         lines = map(format, HISTORY)
-        sublime.active_window().show_quick_panel(lines, on_done)
+        if lines:
+            sublime.active_window().show_quick_panel(lines, on_done)
+        else:
+            sublime.status_message('Nothing in history')
