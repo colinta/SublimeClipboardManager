@@ -33,7 +33,7 @@ class HistoryList(list):
 HISTORY = HistoryList()
 
 
-class ClipboardHistoryBase(sublime_plugin.TextCommand):
+class ClipboardManagerBase(sublime_plugin.TextCommand):
 
     def update_clipboard(self, content):
         sublime.status_message("Set Clipboard to " + content)
@@ -56,7 +56,7 @@ class ClipboardHistoryBase(sublime_plugin.TextCommand):
         return sublime.get_clipboard() == HISTORY.current()
 
 
-class ClipboardHistoryPaste(ClipboardHistoryBase):
+class ClipboardManagerPaste(ClipboardManagerBase):
     def run(self, edit, indent=False):
         # If the user pastes something that was copied in a different program, it will not be in sublime's buffer, so we attempt to append every time
         self.appendClipboard()
@@ -66,7 +66,7 @@ class ClipboardHistoryPaste(ClipboardHistoryBase):
             self.view.run_command('paste')
 
 
-class ClipboardHistoryCut(ClipboardHistoryBase):
+class ClipboardManagerCut(ClipboardManagerBase):
     def run(self, edit):
         # First run sublime's command to extract the selected text.
         # This will set the cut/copy'd data on the clipboard which we can easily steal without recreating the cut/copy logic.
@@ -74,18 +74,18 @@ class ClipboardHistoryCut(ClipboardHistoryBase):
         self.appendClipboard()
 
 
-class ClipboardHistoryCopy(ClipboardHistoryBase):
+class ClipboardManagerCopy(ClipboardManagerBase):
     def run(self, edit):
         self.view.run_command('copy')
         self.appendClipboard()
 
 
-class ClipboardHistoryNext(ClipboardHistoryBase):
+class ClipboardManagerNext(ClipboardManagerBase):
     def run(self, edit):
         self.next()
 
 
-class ClipboardHistoryNextAndPaste(ClipboardHistoryBase):
+class ClipboardManagerNextAndPaste(ClipboardManagerBase):
     def run(self, edit, indent=False):
         self.next()
         if indent:
@@ -94,12 +94,12 @@ class ClipboardHistoryNextAndPaste(ClipboardHistoryBase):
             self.view.run_command('paste')
 
 
-class ClipboardHistoryPrevious(ClipboardHistoryBase):
+class ClipboardManagerPrevious(ClipboardManagerBase):
     def run(self, edit):
         self.previous()
 
 
-class ClipboardHistoryPreviousAndPaste(ClipboardHistoryBase):
+class ClipboardManagerPreviousAndPaste(ClipboardManagerBase):
     def run(self, edit, indent=False):
         self.previous()
         if indent:
@@ -108,7 +108,7 @@ class ClipboardHistoryPreviousAndPaste(ClipboardHistoryBase):
             self.view.run_command('paste')
 
 
-class ClipboardHistoryChooseAndPaste(ClipboardHistoryBase):
+class ClipboardManagerChooseAndPaste(ClipboardManagerBase):
     def run(self, edit):
         def on_done(idx):
             if idx >= 0:
