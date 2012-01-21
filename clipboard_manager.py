@@ -8,27 +8,38 @@ class HistoryList(list):
     """
 
     SIZE = 256
-    index = 0
+    __index = 0
 
-    def append(self, item, update_index=True):
+    def at(self, idx):
+        self.__index = idx if idx < len(self) else 0
+
+    def append(self, item):
         self.insert(0, item)
-        if update_index:
-            self.index = 0
+        self.__index = 0
         if len(self) > self.SIZE:
             del self[self.SIZE:]
 
     def current(self):
         if len(self) == 0:
             return None
-        return self[self.index]
+        return self[self.__index]
 
     def next(self):
-        if self.index > 0:
-            self.index -= 1
+        if self.__index > 0:
+            self.__index -= 1
 
     def previous(self):
-        if self.index < len(self) - 1:
-            self.index += 1
+        if self.__index < len(self) - 1:
+            self.__index += 1
+
+    def first(self):
+        """"first" actually kind of means "last", since this is a FIFO stack"""
+        self.__index = len(self) - 1
+
+    def last(self):
+        """"last" actually kind of means "first", since this is a FIFO stack"""
+        self.__index = 0
+
 
 HISTORY = HistoryList()
 
@@ -48,12 +59,9 @@ class ClipboardManagerBase(sublime_plugin.TextCommand):
         self.update_clipboard(HISTORY.current())
 
     def appendClipboard(self):
-        # append the contents of the clipboard to the history if it is unique
-        if not self.onCurrent():
+        # append the contents of the clipboard to the history
+        if not HISTORY or HISTORY[0] != sublime.get_clipboard():
             HISTORY.append(sublime.get_clipboard())
-
-    def onCurrent(self):
-        return sublime.get_clipboard() == HISTORY.current()
 
 
 class ClipboardManagerPaste(ClipboardManagerBase):
@@ -110,16 +118,21 @@ class ClipboardManagerPreviousAndPaste(ClipboardManagerBase):
 
 class ClipboardManagerChooseAndPaste(ClipboardManagerBase):
     def run(self, edit):
+        def format(line):
+            return line.replace('\n', '\\n')[:64]
+
+        lines = []
+        # filter out duplicates, keeping the first instance, and format
+        for i, line in enumerate(HISTORY):
+            if i == HISTORY.index(line):
+                lines.append(format(line))
+
         def on_done(idx):
             if idx >= 0:
-                HISTORY.index = idx
+                HISTORY.at(idx)
                 self.update_clipboard(HISTORY.current())
                 self.view.run_command('paste')
 
-        def format(line):
-            return line.replace('\n', '$ ')[:64]
-
-        lines = map(format, HISTORY)
         if lines:
             sublime.active_window().show_quick_panel(lines, on_done)
         else:
