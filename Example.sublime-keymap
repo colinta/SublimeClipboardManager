@@ -1,0 +1,15 @@
+[
+    { "keys": ["super+x"], "command": "clipboard_manager_cut" },
+    { "keys": ["super+c"], "command": "clipboard_manager_copy" },
+
+    { "keys": ["super+v"], "command": "clipboard_manager_paste", "args": { "indent": true } },
+    { "keys": ["super+ctrl+v"], "command": "clipboard_manager_paste", "args": { "indent": false } },
+
+    { "keys": ["super+alt+v"], "command": "clipboard_manager_next_and_paste" },
+    { "keys": ["super+shift+v"], "command": "clipboard_manager_previous_and_paste" },
+
+    { "keys": ["super+pagedown"], "command": "clipboard_manager_next" },
+    { "keys": ["super+pageup"], "command": "clipboard_manager_previous" },
+
+    { "keys": ["super+alt+ctrl+v"], "command": "clipboard_manager_choose_and_paste" }
+]
