@@ -121,13 +121,16 @@ class ClipboardManagerChooseAndPaste(ClipboardManagerBase):
             return line.replace('\n', '\\n')[:64]
 
         lines = []
+        line_map = {}
         # filter out duplicates, keeping the first instance, and format
         for i, line in enumerate(HISTORY):
             if i == HISTORY.index(line):
+                line_map[len(lines)] = i
                 lines.append(format(line))
 
         def on_done(idx):
             if idx >= 0:
+                idx = line_map[idx]
                 HISTORY.at(idx)
                 self.update_clipboard(HISTORY.current())
                 self.view.run_command('paste')
