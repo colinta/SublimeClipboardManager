@@ -3,8 +3,9 @@ import sublime_plugin
 
 
 class HistoryList(list):
-    """List type for storing the history - fairly
-    inefficient, but useful.
+    """
+    List type for storing the history.
+    Maintains a "pointer" to the current clipboard item
     """
 
     SIZE = 256
