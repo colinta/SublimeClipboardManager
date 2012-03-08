@@ -11,9 +11,6 @@ class HistoryList(list):
     SIZE = 256
     __index = 0
 
-    def at(self, idx):
-        self.__index = idx if idx < len(self) else 0
-
     def show(self):
         ret = ""
         ret += " CLIPBOARD HISTORY (%d)\n" % len(self)
@@ -44,6 +41,10 @@ class HistoryList(list):
         if len(self) == 0:
             return None
         return self[self.__index]
+
+    def at(self, idx):
+        self.__index = (idx if idx < len(self) else 0)
+        self.status()
 
     def next(self):
         if self.__index > 0:
