@@ -23,11 +23,17 @@ Or:
 Commands
 --------
 
+**The basics**
+
 `clipboard_manager_cut`: Self Explanatory
 
 `clipboard_manager_copy`: Self Explanatory
 
 `clipboard_manager_paste`: Self Explanatory. *Options*: indent (default: False): Determines whether to use `paste` or `paste_and_indent` built-in command.
+
+- - - - - -
+
+**Navigating clipboard history**
 
 `clipboard_manager_next_and_paste`: Goes to the next entry in the history and pastes it. *Options*: indent (default: False)
 
@@ -38,3 +44,14 @@ Commands
 `clipboard_manager_previous`: Goes to the previous entry in the history, but doesn't paste.  (the content will appear as a status message)
 
 `clipboard_manager_choose_and_paste`: Shows the clipboard history in a "quick panel".
+
+- - - - - -
+
+**Registers**
+
+`clipboard_manager_copy_to_register`: Puts the selection into a `register`.
+
+`clipboard_manager_paste_from_register`: Pastes the contents of a `register`.
+
+Right now registers do not add/remove from the clipboard history.  *This may
+change!!*  I would appreciate feedback about this feature.

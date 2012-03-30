@@ -7,7 +7,7 @@ class HistoryList(list):
     List type for storing the history.
     Maintains a "pointer" to the current clipboard item
     """
-
+    registers = {}
     SIZE = 256
     __index = 0
 
@@ -25,6 +25,15 @@ class HistoryList(list):
             item = item.replace("\r", "\\r")
             ret += str(i + 1) + '. ' + item + "\n"
         return ret
+
+    def register(self, register, *args):
+        if args:
+            if len(args) == 1:
+                self.registers[register] = args[0]
+            else:
+                self.registers[register] = "\n".join(args)
+        else:
+            return self.registers[register]
 
     def append(self, item):
         """
@@ -99,6 +108,18 @@ class ClipboardManagerCopy(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('copy')
         append_clipboard()
+
+
+class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
+    def run(self, edit, register):
+        self.view.run_command('copy')
+        HISTORY.register(register, sublime.get_clipboard())
+
+
+class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
+    def run(self, edit, register):
+        sublime.set_clipboard(HISTORY.register(register))
+        self.view.run_command('paste')
 
 
 class ClipboardManagerNext(sublime_plugin.TextCommand):

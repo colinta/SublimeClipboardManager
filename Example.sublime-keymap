@@ -12,5 +12,27 @@
     { "keys": ["super+pagedown"], "command": "clipboard_manager_previous" },
     { "keys": ["super+home"], "command": "clipboard_manager_show" },
 
-    { "keys": ["super+alt+ctrl+v"], "command": "clipboard_manager_choose_and_paste" }
+    { "keys": ["super+alt+ctrl+v"], "command": "clipboard_manager_choose_and_paste" },
+
+    { "keys": ["super+alt+c", "1"], "command": "clipboard_manager_copy_to_register", "args": { "register": "1" } },
+    { "keys": ["super+alt+c", "2"], "command": "clipboard_manager_copy_to_register", "args": { "register": "2" } },
+    { "keys": ["super+alt+c", "3"], "command": "clipboard_manager_copy_to_register", "args": { "register": "3" } },
+    { "keys": ["super+alt+c", "4"], "command": "clipboard_manager_copy_to_register", "args": { "register": "4" } },
+    { "keys": ["super+alt+c", "5"], "command": "clipboard_manager_copy_to_register", "args": { "register": "5" } },
+    { "keys": ["super+alt+c", "6"], "command": "clipboard_manager_copy_to_register", "args": { "register": "6" } },
+    { "keys": ["super+alt+c", "7"], "command": "clipboard_manager_copy_to_register", "args": { "register": "7" } },
+    { "keys": ["super+alt+c", "8"], "command": "clipboard_manager_copy_to_register", "args": { "register": "8" } },
+    { "keys": ["super+alt+c", "9"], "command": "clipboard_manager_copy_to_register", "args": { "register": "9" } },
+    { "keys": ["super+alt+c", "0"], "command": "clipboard_manager_copy_to_register", "args": { "register": "0" } },
+
+    { "keys": ["super+ctrl+c", "1"], "command": "clipboard_manager_paste_from_register", "args": { "register": "1" } },
+    { "keys": ["super+ctrl+c", "2"], "command": "clipboard_manager_paste_from_register", "args": { "register": "2" } },
+    { "keys": ["super+ctrl+c", "3"], "command": "clipboard_manager_paste_from_register", "args": { "register": "3" } },
+    { "keys": ["super+ctrl+c", "4"], "command": "clipboard_manager_paste_from_register", "args": { "register": "4" } },
+    { "keys": ["super+ctrl+c", "5"], "command": "clipboard_manager_paste_from_register", "args": { "register": "5" } },
+    { "keys": ["super+ctrl+c", "6"], "command": "clipboard_manager_paste_from_register", "args": { "register": "6" } },
+    { "keys": ["super+ctrl+c", "7"], "command": "clipboard_manager_paste_from_register", "args": { "register": "7" } },
+    { "keys": ["super+ctrl+c", "8"], "command": "clipboard_manager_paste_from_register", "args": { "register": "8" } },
+    { "keys": ["super+ctrl+c", "9"], "command": "clipboard_manager_paste_from_register", "args": { "register": "9" } },
+    { "keys": ["super+ctrl+c", "0"], "command": "clipboard_manager_paste_from_register", "args": { "register": "0" } }
 ]
