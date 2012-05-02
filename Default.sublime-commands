@@ -30,5 +30,13 @@
     {
         "caption": "Clipboard Manager: Choose & Paste",
         "command": "clipboard_manager_choose_and_paste"
+    },
+    {
+        "caption": "Clipboard Manager: Show History",
+        "command": "clipboard_manager_show"
+    },
+    {
+        "caption": "Clipboard Manager: Show Registers",
+        "command": "clipboard_manager_show_registers"
     }
 ]

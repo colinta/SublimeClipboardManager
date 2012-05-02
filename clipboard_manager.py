@@ -20,25 +20,42 @@ class HistoryList(list):
                 ret += '--> '
             else:
                 ret += '    '
-            item = item.replace("\t", "\\t")
-            item = item.replace("\n", "\\n")
-            item = item.replace("\r", "\\r")
-            ret += str(i + 1) + '. ' + item + "\n"
+            item = item.replace("\t", '\\t')
+            item = item.replace("\r\n", "\n")
+            item = item.replace("\r", "\n")
+            item = item.replace("\n", "\n" + '       > ')
+            ret += u'{i:>3}. {item}\n'.format(i=str(i + 1)[-3:], item=item)
+        return ret
+
+    def show_registers(self):
+        ret = ""
+        ret += " CLIPBOARD REGISTERS (%d)\n" % len(self.registers.items())
+        ret += "=====================%s==\n" % ("=" * len(str(len(self.registers.items()))))
+        for key, item in self.registers.iteritems():
+            item = item.replace("\t", '\\t')
+            item = item.replace("\r\n", "\n")
+            item = item.replace("\r", "\n")
+            item = item.replace("\n", "\n" + ' > ')
+            ret += '{key:<1}: {item}\n'.format(key=key, item=item)
         return ret
 
     def register(self, register, *args):
         if args:
             if len(args) == 1:
-                self.registers[register] = args[0]
+                copy = args[0]
             else:
-                self.registers[register] = "\n".join(args)
+                copy = "\n".join(args)
+            self.registers[register] = copy
+            copy = copy.replace("\t", "\\t")
+            copy = copy.replace("\n", "\\n")
+            copy = copy.replace("\r", "\\r")
+            sublime.status_message('Set Clipboard Register "{0}" to "{1}"'.format(register, copy))
         else:
             return self.registers[register]
 
     def append(self, item):
         """
-        Appends to the history only if it isn't the current
-        item.
+        Appends to the history only if it isn't the current item.
         """
         if not self or self[self.__index] != item:
             self.insert(0, item)
@@ -76,7 +93,11 @@ class HistoryList(list):
         self.status()
 
     def status(self):
-        sublime.status_message('Set Clipboard to "' + self.current() + '"')
+        copy = self.current()
+        copy = copy.replace("\t", "\\t")
+        copy = copy.replace("\n", "\\n")
+        copy = copy.replace("\r", "\\r")
+        sublime.status_message('Set Clipboard to "{copy}"'.format(copy=copy))
         sublime.set_clipboard(self.current())
 
 
@@ -156,6 +177,16 @@ class ClipboardManagerShow(sublime_plugin.WindowCommand):
         e = v.begin_edit('clipboard_manager')
         v.replace(e, sublime.Region(0, v.size()), '')
         v.insert(e, 0, HISTORY.show())
+        v.end_edit(e)
+        self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+
+
+class ClipboardManagerShowRegisters(sublime_plugin.WindowCommand):
+    def run(self):
+        v = self.window.get_output_panel('clipboard_manager')
+        e = v.begin_edit('clipboard_manager')
+        v.replace(e, sublime.Region(0, v.size()), '')
+        v.insert(e, 0, HISTORY.show_registers())
         v.end_edit(e)
         self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
 
