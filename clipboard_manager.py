@@ -123,18 +123,21 @@ class ClipboardManagerCut(sublime_plugin.TextCommand):
         # This will set the cut/copy'd data on the clipboard which we can easily steal without recreating the cut/copy logic.
         self.view.run_command('cut')
         append_clipboard()
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerCopy(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('copy')
         append_clipboard()
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
     def run(self, edit, register):
         self.view.run_command('copy')
         HISTORY.register(register, sublime.get_clipboard())
+        self.view.window().run_command('clipboard_manager_show_registers', {'show': False})
 
 
 class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
@@ -146,6 +149,7 @@ class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
 class ClipboardManagerNext(sublime_plugin.TextCommand):
     def run(self, edit):
         HISTORY.next()
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerNextAndPaste(sublime_plugin.TextCommand):
@@ -155,11 +159,13 @@ class ClipboardManagerNextAndPaste(sublime_plugin.TextCommand):
             self.view.run_command('paste_and_indent')
         else:
             self.view.run_command('paste')
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerPrevious(sublime_plugin.TextCommand):
     def run(self, edit):
         HISTORY.previous()
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
@@ -169,26 +175,29 @@ class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
             self.view.run_command('paste_and_indent')
         else:
             self.view.run_command('paste')
+        self.view.window().run_command('clipboard_manager_show', {'show': False})
 
 
 class ClipboardManagerShow(sublime_plugin.WindowCommand):
-    def run(self):
+    def run(self, show=True):
         v = self.window.get_output_panel('clipboard_manager')
         e = v.begin_edit('clipboard_manager')
         v.replace(e, sublime.Region(0, v.size()), '')
         v.insert(e, 0, HISTORY.show())
         v.end_edit(e)
-        self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+        if show:
+            self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
 
 
 class ClipboardManagerShowRegisters(sublime_plugin.WindowCommand):
-    def run(self):
+    def run(self, show=True):
         v = self.window.get_output_panel('clipboard_manager')
         e = v.begin_edit('clipboard_manager')
         v.replace(e, sublime.Region(0, v.size()), '')
         v.insert(e, 0, HISTORY.show_registers())
         v.end_edit(e)
-        self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+        if show:
+            self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
 
 
 class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):

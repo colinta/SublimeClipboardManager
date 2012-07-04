@@ -26,6 +26,7 @@ Or:
     - Linux: ~/.Sublime Text 2/Packages/
 
 2. clone this repo
+3. Install keymaps for the commands (see Example.sublime-keymap for my preferred keys)
 
 Commands
 --------
@@ -96,3 +97,27 @@ bindings.
 
 Shows the clipboard registers in an "output panel", similar to
 `clipboard_manager_show`.
+
+- - - - - -
+
+**Helpful Tips**
+
+There are two ways to find out what you've got hanging out in your clipboard
+history, you should use both.  The `clipboard_manager_choose_and_paste` command
+is your goto.  It uses the fuzzy finder input panel, so you can quickly find and
+paste the entry you want.
+
+The other useful trick is to use `clipboard_manager_show` to show an output
+panel at the bottom of the screen.  As you scroll through history using
+`clipboard_manager_next` and `clipboard_manager_previous`, it will update that
+panel, with an arrow pointing the current entry.  Then you can
+`clipboard_manager_next_and_paste`, and it will get updated then, too.  Keeps
+you sane if you're doing something crazy.
+
+If you've got a repetive task to do, with lots of copy/pastes, use registers.
+They do not get affected by usual copy/pasting, so you can rest assured that
+your work flow will not get affected.  The keyboard shortcuts are unfortunately
+quite verbose (`super+ctrl+shift+c, letter/digit`), but look at
+Example.sublime-keymap and you'll see that it is easy to assign a quicker
+shortcut for registers you like to use.  Registers do not have to be one letter,
+any string can be used as the key.

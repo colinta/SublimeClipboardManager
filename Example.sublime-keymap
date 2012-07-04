@@ -11,6 +11,7 @@
     { "keys": ["super+pageup"], "command": "clipboard_manager_next" },
     { "keys": ["super+pagedown"], "command": "clipboard_manager_previous" },
     { "keys": ["super+home"], "command": "clipboard_manager_show" },
+    { "keys": ["super+end"], "command": "clipboard_manager_show_registers" },
 
     { "keys": ["super+alt+ctrl+v"], "command": "clipboard_manager_choose_and_paste" },
 
