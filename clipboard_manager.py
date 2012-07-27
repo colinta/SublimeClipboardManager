@@ -97,7 +97,7 @@ class HistoryList(list):
         copy = copy.replace("\t", "\\t")
         copy = copy.replace("\n", "\\n")
         copy = copy.replace("\r", "\\r")
-        sublime.status_message('Set Clipboard to "{copy}"'.format(copy=copy))
+        sublime.status_message(u'Set Clipboard to "{copy}"'.format(copy=copy))
         sublime.set_clipboard(self.current())
 
 
