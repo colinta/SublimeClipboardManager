@@ -36,7 +36,7 @@ class HistoryList(list):
             item = item.replace("\r\n", "\n")
             item = item.replace("\r", "\n")
             item = item.replace("\n", "\n" + ' > ')
-            ret += '{key:<1}: {item}\n'.format(key=key, item=item)
+            ret += u'{key:<1}: {item}\n'.format(key=key, item=item)
         return ret
 
     def register(self, register, *args):
