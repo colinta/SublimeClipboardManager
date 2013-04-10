@@ -31,7 +31,7 @@ class HistoryList(list):
         ret = ""
         ret += " CLIPBOARD REGISTERS (%d)\n" % len(self.registers.items())
         ret += "=====================%s==\n" % ("=" * len(str(len(self.registers.items()))))
-        for key, item in self.registers.iteritems():
+        for key, item in self.registers.items():
             item = item.replace("\t", '\\t')
             item = item.replace("\r\n", "\n")
             item = item.replace("\r", "\n")
@@ -181,10 +181,7 @@ class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
 class ClipboardManagerShow(sublime_plugin.WindowCommand):
     def run(self, show=True):
         v = self.window.get_output_panel('clipboard_manager')
-        e = v.begin_edit('clipboard_manager')
-        v.replace(e, sublime.Region(0, v.size()), '')
-        v.insert(e, 0, HISTORY.show())
-        v.end_edit(e)
+        v.run_command('clipboard_manager_dummy1', {'content': HISTORY.show()})
         if show:
             self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
 
@@ -192,13 +189,16 @@ class ClipboardManagerShow(sublime_plugin.WindowCommand):
 class ClipboardManagerShowRegisters(sublime_plugin.WindowCommand):
     def run(self, show=True):
         v = self.window.get_output_panel('clipboard_manager')
-        e = v.begin_edit('clipboard_manager')
-        v.replace(e, sublime.Region(0, v.size()), '')
-        v.insert(e, 0, HISTORY.show_registers())
-        v.end_edit(e)
+        v.run_command('clipboard_manager_dummy1', {'content': HISTORY.show_registers()})
         if show:
             self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
 
+
+class ClipboardManagerDummy1(sublime_plugin.TextCommand):
+    def run(self, edit, content):
+        region = sublime.Region(0, self.view.size())
+        self.view.replace(edit, region, '')
+        self.view.insert(edit, 0, content)
 
 class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
     def run(self, edit):
