@@ -6,7 +6,7 @@ that makes for TextMate-like clipboard history.
 
 Originally written by AJ Palkovic ([ajpalkovic](https://github.com/ajpalkovic/SublimePlugins)),
 modified by Martin Aspeli ([optilude](https://gist.github.com/1132507)), and
-further modified and packaged for `Package Control` by Colin Thomas-Arnold
+further modified and packaged for `Package Control` by Colin T.A. Gray
 ([colinta](https://github.com/colinta/SublimeClipboardManager))
 
 My version of this plugin *does not use* `clipboard_history` as the prefix.  See
