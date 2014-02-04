@@ -36,6 +36,10 @@
         "command": "clipboard_manager_show"
     },
     {
+        "caption": "Clipboard Manager: Copy to Register",
+        "command": "clipboard_manager_copy_to_register"
+    },
+    {
         "caption": "Clipboard Manager: Show Registers",
         "command": "clipboard_manager_show_registers"
     }

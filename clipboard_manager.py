@@ -134,10 +134,21 @@ class ClipboardManagerCopy(sublime_plugin.TextCommand):
 
 
 class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
-    def run(self, edit, register):
-        self.view.run_command('copy')
-        HISTORY.register(register, sublime.get_clipboard())
-        self.view.window().run_command('clipboard_manager_show_registers', {'show': False})
+    def run(self, edit, register=None, content=None):
+        if register:
+            self.view.run_command('copy')
+            if content is None:
+                content = sublime.get_clipboard()
+            HISTORY.register(register, content)
+            self.view.window().run_command('clipboard_manager_show_registers', {'show': False})
+        else:
+            self.view.run_command('copy')
+            content = sublime.get_clipboard()
+            chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+            lines = list(chars)
+            def on_done(idx):
+                self.view.window().run_command('clipboard_manager_copy_to_register', {'register': lines[idx], 'content': content})
+            sublime.active_window().show_quick_panel(lines, on_done)
 
 
 class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
