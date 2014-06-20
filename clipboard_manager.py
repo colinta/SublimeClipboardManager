@@ -1,3 +1,5 @@
+import re
+
 import sublime
 import sublime_plugin
 
@@ -104,15 +106,26 @@ class HistoryList(list):
 HISTORY = HistoryList([sublime.get_clipboard()])
 
 
+def clipboard_without_ibooks_quotes():
+    clipboard = sublime.get_clipboard()
+    quotes_re = re.compile(r'^“(.*?)”\s+Excerpt From:.*$', re.DOTALL)
+    match = quotes_re.search(clipboard)
+    if match:
+        clipboard = match.group(1)
+        sublime.set_clipboard(clipboard)
+    return clipboard
+
+
 def append_clipboard():
     '''
     Append the contents of the clipboard to the HISTORY global.
     '''
-    HISTORY.append(sublime.get_clipboard())
+    HISTORY.append(clipboard_without_ibooks_quotes())
 
 
 class ClipboardManagerPaste(sublime_plugin.TextCommand):
     def run(self, edit, indent=False):
+        clipboard_without_ibooks_quotes()
         if indent:
             self.view.run_command('paste_and_indent')
         else:
