@@ -105,7 +105,9 @@ HISTORY = HistoryList([sublime.get_clipboard()])
 
 
 def append_clipboard():
-    # append the contents of the clipboard to the history
+    '''
+    Append the contents of the clipboard to the HISTORY global.
+    '''
     HISTORY.append(sublime.get_clipboard())
 
 
@@ -119,8 +121,11 @@ class ClipboardManagerPaste(sublime_plugin.TextCommand):
 
 class ClipboardManagerCut(sublime_plugin.TextCommand):
     def run(self, edit):
-        # First run sublime's command to extract the selected text.
-        # This will set the cut/copy'd data on the clipboard which we can easily steal without recreating the cut/copy logic.
+        '''
+        First run sublime's command to extract the selected text. This will set
+        the cut/copy'd data on the clipboard which we can easily steal without
+        recreating the cut/copy logic.
+        '''
         self.view.run_command('cut')
         append_clipboard()
         self.view.window().run_command('clipboard_manager_show', {'show': False})
