@@ -1,7 +1,7 @@
 Clipboard Manager
 =================
 
-A version of the Sublime Text 2 plugin at <http://www.sublimetext.com/forum/viewtopic.php?f=5&t=2260&start=0> that makes for TextMate-like clipboard history.
+A version of the Sublime Text plugin at <http://www.sublimetext.com/forum/viewtopic.php?f=5&t=2260&start=0> that makes for TextMate-like clipboard history.
 
 Originally written by AJ Palkovic ([ajpalkovic](https://github.com/ajpalkovic/SublimePlugins)), modified by Martin Aspeli ([optilude](https://gist.github.com/1132507)), and further (heavily) modified and packaged for `Package Control` by Colin T.A. Gray ([colinta](https://github.com/colinta/SublimeClipboardManager))
 
