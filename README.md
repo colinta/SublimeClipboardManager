@@ -10,6 +10,10 @@ My (colinta) version of this plugin *does not use* `clipboard_history` as the pr
 Installation
 ------------
 
+**Most importantly:** Clipboard Manager must be registered to receive the copy and cut commands, so be sure
+to assign `clipboard_manager_copy` to `ctrl/super+c` and `clipboard_manager_cup` to `ctrl/super+x`. These
+commands delegate to the sublime text built in commands, but also add the copied text to its internal history.
+
 1. Using Package Control, install "Clipboard Manager"
 
 Or:
