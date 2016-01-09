@@ -123,6 +123,16 @@ def append_clipboard():
     HISTORY.append(clipboard_without_ibooks_quotes())
 
 
+def update_output_panel(window, registers=False):
+    '''
+    Update output panel with latest history if it is visible
+    '''
+    panel = window.get_output_panel('clipboard_manager')
+    if panel.window():
+        content = HISTORY.show_registers() if registers else HISTORY.show()
+        panel.run_command('clipboard_manager_dummy', {'content': content })
+
+
 class ClipboardManagerPaste(sublime_plugin.TextCommand):
     def run(self, edit, indent=False):
         clipboard_without_ibooks_quotes()
@@ -141,14 +151,14 @@ class ClipboardManagerCut(sublime_plugin.TextCommand):
         '''
         self.view.run_command('cut')
         append_clipboard()
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerCopy(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('copy')
         append_clipboard()
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
@@ -158,7 +168,7 @@ class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
             if content is None:
                 content = sublime.get_clipboard()
             HISTORY.register(register, content)
-            self.view.window().run_command('clipboard_manager_show_registers', {'show': False})
+            update_output_panel(self.view.window(), True)
         else:
             self.view.run_command('copy')
             content = sublime.get_clipboard()
@@ -178,7 +188,7 @@ class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
 class ClipboardManagerNext(sublime_plugin.TextCommand):
     def run(self, edit):
         HISTORY.next()
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerNextAndPaste(sublime_plugin.TextCommand):
@@ -188,13 +198,13 @@ class ClipboardManagerNextAndPaste(sublime_plugin.TextCommand):
             self.view.run_command('paste_and_indent')
         else:
             self.view.run_command('paste')
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerPrevious(sublime_plugin.TextCommand):
     def run(self, edit):
         HISTORY.previous()
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
@@ -204,30 +214,20 @@ class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
             self.view.run_command('paste_and_indent')
         else:
             self.view.run_command('paste')
-        self.view.window().run_command('clipboard_manager_show', {'show': False})
+        update_output_panel(self.view.window())
 
 
 class ClipboardManagerShow(sublime_plugin.WindowCommand):
-    def run(self, show=True):
-        v = self.window.get_output_panel('clipboard_manager')
-        v.run_command('clipboard_manager_dummy1', {'content': HISTORY.show()})
-        if show:
-            self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+    def run(self):
+        self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+        update_output_panel(self.window)
 
 
 class ClipboardManagerShowRegisters(sublime_plugin.WindowCommand):
-    def run(self, show=True):
-        v = self.window.get_output_panel('clipboard_manager')
-        v.run_command('clipboard_manager_dummy1', {'content': HISTORY.show_registers()})
-        if show:
-            self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+    def run(self):
+        self.window.run_command('show_panel', {'panel': 'output.clipboard_manager'})
+        update_output_panel(self.window, True)
 
-
-class ClipboardManagerDummy1(sublime_plugin.TextCommand):
-    def run(self, edit, content):
-        region = sublime.Region(0, self.view.size())
-        self.view.replace(edit, region, '')
-        self.view.insert(edit, 0, content)
 
 class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -257,3 +257,10 @@ class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
 class ClipboardManagerEventListener(sublime_plugin.EventListener):
     def on_activated(self, view):
         append_clipboard()
+
+
+class ClipboardManagerDummy(sublime_plugin.TextCommand):
+    def run(self, edit, content):
+        region = sublime.Region(0, self.view.size())
+        self.view.replace(edit, region, '')
+        self.view.insert(edit, 0, content)
