@@ -26,12 +26,29 @@ Or:
 2. clone this repo
 3. Install keymaps for the commands (see Example.sublime-keymap for my preferred keys)
 
-### Sublime Text 2
+Open `Preferences > Key Bindings` and copy the key bindings from `Example.sublime-keymap` that you want to use.  First you need to override the cut/copy/paste commands, so that the pasteboard entries can be stored in history:
 
-1. Open the Sublime Text 2 Packages folder
-2. clone this repo, but use the `st2` branch
+``` json
+    { "keys": ["super+x"], "command": "clipboard_manager_cut" },
+    { "keys": ["super+c"], "command": "clipboard_manager_copy" },
+    { "keys": ["super+v"], "command": "clipboard_manager_paste", "args": { "indent": true } },
+```
 
-       git clone -b st2 git@github.com:colinta/SublimeClipboardManager
+Next you'll want to bind `next_and_paste` and `previous_and_paste`, these move forward and backward through history and paste the next/previous entry:
+
+``` json
+    { "keys": ["super+alt+v"], "command": "clipboard_manager_next_and_paste" },
+    { "keys": ["super+shift+v"], "command": "clipboard_manager_previous_and_paste" },
+```
+
+The "choose and paste" command is super useful, and it uses the fuzzy finder so you can search your history:
+
+```
+    { "keys": ["super+alt+ctrl+v"], "command": "clipboard_manager_choose_and_paste" },
+```
+
+More commands are outlined below.
+
 
 Commands
 --------
@@ -80,11 +97,11 @@ Shows the clipboard history in an "output panel", and points to the current clip
 
 **Registers**
 
-Right now registers do not add/remove from the clipboard history.  *This may change!!*  I would appreciate feedback about this feature.
+Registers do not add/remove from the clipboard history, they are a place to store text that won't be affected by clipboard history.
 
 `clipboard_manager_copy_to_register` (there are a ton, e.g. `super+ctrl+shift+c, 1`, `super+ctrl+shift+c, a`)
 
-Puts the selection into a `register`.  The example keymap includes a register binding for every number and letter.  Register keys should be single characters.
+Puts the selection into a `register`.  The example keymap includes a register binding for every number and letter.
 
 `clipboard_manager_paste_from_register` (`super+ctrl+shift+v, 1`, `super+ctrl+shift+v, a`)
 
@@ -100,6 +117,6 @@ Shows the clipboard registers in an "output panel", similar to `clipboard_manage
 
 There are two ways to find out what you've got hanging out in your clipboard history, you should use both.  The `clipboard_manager_choose_and_paste` command is your goto.  It uses the fuzzy finder input panel, so you can quickly find and paste the entry you want.
 
-The other useful trick is to use `clipboard_manager_show` to show an output panel at the bottom of the screen.  As you scroll through history using `clipboard_manager_next` and `clipboard_manager_previous`, it will update that panel, with an arrow pointing the current entry.  Then you can `clipboard_manager_next_and_paste`, and it will get updated then, too.  Keeps you sane if you're doing something crazy.
+The other useful trick is to use `clipboard_manager_show` to show an output panel at the bottom of the screen.  As you scroll through history using `clipboard_manager_next` and `clipboard_manager_previous`, it will update that panel, with an arrow pointing to the current entry.  Then you can `clipboard_manager_next_and_paste`, and it will get updated then, too.  Keeps you sane if you're doing something crazy.
 
 If you've got a repetive task to do, with lots of copy/pastes, use registers. They do not get affected by usual copy/pasting, so you can rest assured that your work flow will not get affected.  The keyboard shortcuts are unfortunately quite verbose (`super+ctrl+shift+c, letter/digit`), but look at Example.sublime-keymap and you'll see that it is easy to assign a quicker shortcut for registers you like to use.  Registers do not have to be one letter, any string can be used as the key.
