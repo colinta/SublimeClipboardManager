@@ -5,7 +5,13 @@ import sublime_plugin
 
 
 HISTORY = None
-PANEL_SHOWING = None
+MAX_PANEL_LENGTH = 100
+PLAIN_SYNTAX = 'Packages/Text/Plain text.tmLanguage'
+
+current_panel_showing = None
+SHOW_ALL='all'
+SHOW_REGISTERS='registers'
+SHOW_CURRENT='current'
 
 
 def plugin_loaded():
@@ -34,14 +40,12 @@ class HistoryList(list):
         return self.show(entry, panel)
 
     def show(self, entry, panel):
-        syntax = entry.syntax or 'Packages/Text/Plain text.tmLanguage'
-        panel.set_syntax_file(syntax)
+        panel.set_syntax_file(entry.syntax or PLAIN_SYNTAX)
         ret = entry.item
         return ret
 
     def show_all(self, panel):
-        syntax = 'Packages/Text/Plain text.tmLanguage'
-        panel.set_syntax_file(syntax)
+        panel.set_syntax_file(PLAIN_SYNTAX)
 
         ret = ""
         ret += " CLIPBOARD HISTORY (%d)\n" % len(self)
@@ -60,8 +64,7 @@ class HistoryList(list):
         return ret
 
     def show_all(self, panel):
-        syntax = 'Packages/Text/Plain text.tmLanguage'
-        panel.set_syntax_file(syntax)
+        panel.set_syntax_file(PLAIN_SYNTAX)
 
         ret = ""
         ret += " CLIPBOARD HISTORY (%d)\n" % len(self)
@@ -80,10 +83,16 @@ class HistoryList(list):
         return ret
 
     def show_registers(self, panel):
+        panel.set_syntax_file(PLAIN_SYNTAX)
+
+        count = str(len(self.registers))
         ret = ""
-        ret += " CLIPBOARD REGISTERS (%d)\n" % len(self.registers.items())
-        ret += "=====================%s==\n" % ("=" * len(str(len(self.registers.items()))))
-        for key, item in self.registers.items():
+        ret += " CLIPBOARD REGISTERS (%d)\n" % count
+        ret += "=====================%s==\n" % ("=" * len(count))
+        keys = list(self.registers.keys())
+        keys.sort()
+        for key in keys:
+            item = self.registers[key].item
             item = item.replace("\t", '\\t')
             item = item.replace("\r\n", "\n")
             item = item.replace("\r", "\n")
@@ -91,19 +100,19 @@ class HistoryList(list):
             ret += u'{key:<1}: {item}\n'.format(key=key, item=item)
         return ret
 
-    def register(self, register, *args):
-        if args:
-            if len(args) == 1:
-                copy = args[0]
-            else:
-                copy = "\n".join(args)
-            self.registers[register] = copy
-            copy = copy.replace("\t", "\\t")
-            copy = copy.replace("\n", "\\n")
-            copy = copy.replace("\r", "\\r")
-            sublime.status_message('Set Clipboard Register "{0}" to "{1}"'.format(register, copy))
-        else:
-            return self.registers[register]
+    def get_register(self, register):
+        try:
+            return self.registers[register].item
+        except KeyError:
+            return ''
+
+
+    def set_register(self, register, content, syntax):
+        self.registers[register] = HistoryEntry(content, syntax)
+        status = content.replace("\t", "\\t") \
+                        .replace("\n", "\\n") \
+                        .replace("\r", "\\r")
+        sublime.status_message('Set Clipboard Register "{0}" to "{1}"'.format(register, status))
 
     def append(self, item, syntax=None):
         """
@@ -177,7 +186,7 @@ def clipboard_without_ibooks_quotes():
     return clipboard
 
 
-def append_clipboard(syntax=None):
+def append_current_clipboard(syntax=None):
     '''
     Append the contents of the clipboard to the HISTORY global.
     '''
@@ -196,18 +205,18 @@ def update_output_panel(window, show=None, make_visible=False):
     if not panel.window():
         return
 
-    global PANEL_SHOWING
-    show = show or PANEL_SHOWING
-    if show == 'registers':
-        PANEL_SHOWING = 'registers'
+    global current_panel_showing
+    show = show or current_panel_showing
+    if show == SHOW_REGISTERS:
+        current_panel_showing = SHOW_REGISTERS
         content = HISTORY.show_registers(panel)
-    elif show == 'all':
-        PANEL_SHOWING = 'all'
+    elif show == SHOW_ALL:
+        current_panel_showing = SHOW_ALL
         content = HISTORY.show_all(panel)
     elif isinstance(show, HistoryEntry):
         content = HISTORY.show(show, panel)
     else:
-        PANEL_SHOWING = 'current'
+        current_panel_showing = SHOW_CURRENT
         content = HISTORY.show_current(panel)
 
     panel.run_command('clipboard_manager_dummy', {'content': content })
@@ -230,15 +239,15 @@ class ClipboardManagerCut(sublime_plugin.TextCommand):
         recreating the cut/copy logic.
         '''
         self.view.run_command('cut')
-        append_clipboard(self.view.settings().get('syntax'))
-        update_output_panel(self.view.window())
+        append_current_clipboard(self.view.settings().get('syntax'))
+        update_output_panel(self.view.window(), show=SHOW_CURRENT)
 
 
 class ClipboardManagerCopy(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.run_command('copy')
-        append_clipboard(self.view.settings().get('syntax'))
-        update_output_panel(self.view.window())
+        append_current_clipboard(self.view.settings().get('syntax'))
+        update_output_panel(self.view.window(), show=SHOW_CURRENT)
 
 
 class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
@@ -247,13 +256,12 @@ class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
             self.view.run_command('copy')
             if content is None:
                 content = sublime.get_clipboard()
-            HISTORY.register(register, content)
-            update_output_panel(self.view.window(), show='registers')
+            HISTORY.set_register(register, content, self.view.settings().get('syntax'))
+            update_output_panel(self.view.window(), show=SHOW_REGISTERS)
         else:
             self.view.run_command('copy')
             content = sublime.get_clipboard()
-            chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
-            lines = list(chars)
+            lines = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
             def on_done(idx):
                 self.view.window().run_command('clipboard_manager_copy_to_register', {'register': lines[idx], 'content': content})
             sublime.active_window().show_quick_panel(lines, on_done)
@@ -261,7 +269,7 @@ class ClipboardManagerCopyToRegister(sublime_plugin.TextCommand):
 
 class ClipboardManagerPasteFromRegister(sublime_plugin.TextCommand):
     def run(self, edit, register):
-        sublime.set_clipboard(HISTORY.register(register))
+        sublime.set_clipboard(HISTORY.get_register(register))
         self.view.run_command('paste')
 
 
@@ -270,10 +278,10 @@ class ClipboardManagerNext(sublime_plugin.TextCommand):
         window = self.view.window()
         panel = window.find_output_panel('clipboard_manager')
         panel_visible = panel and panel.window() is not None
-        if PANEL_SHOWING == 'all' and panel_visible:
-            show = 'all'
+        if PANEL_SHOWING == SHOW_ALL and panel_visible:
+            show = SHOW_ALL
         else:
-            show = 'current'
+            show = SHOW_CURRENT
         HISTORY.goto_next()
         update_output_panel(window, show=show, make_visible=True)
 
@@ -293,10 +301,10 @@ class ClipboardManagerPrevious(sublime_plugin.TextCommand):
         window = self.view.window()
         panel = window.find_output_panel('clipboard_manager')
         panel_visible = panel and panel.window() is not None
-        if PANEL_SHOWING == 'all' and panel_visible:
-            show = 'all'
+        if PANEL_SHOWING == SHOW_ALL and panel_visible:
+            show = SHOW_ALL
         else:
-            show = 'current'
+            show = SHOW_CURRENT
         HISTORY.goto_previous()
         update_output_panel(window, show=show, make_visible=True)
 
@@ -313,20 +321,21 @@ class ClipboardManagerPreviousAndPaste(sublime_plugin.TextCommand):
 
 class ClipboardManagerShow(sublime_plugin.WindowCommand):
     def run(self):
-        update_output_panel(self.window, show='all', make_visible=True)
+        update_output_panel(self.window, show=SHOW_ALL, make_visible=True)
 
 
 class ClipboardManagerShowRegisters(sublime_plugin.WindowCommand):
     def run(self):
-        update_output_panel(self.window, show='registers', make_visible=True)
+        update_output_panel(self.window, show=SHOW_REGISTERS, make_visible=True)
 
 
 class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
     def run(self, edit):
         def format(line):
-            return line.replace('\n', '\\n')[:64]
+            return line.replace('\n', '↩︎')[:MAX_PANEL_LENGTH]
 
         lines = []
+        # map the selection index to the index in HISTORY
         line_map = {}
         # filter out duplicates, keeping the first instance, and format
         for i, entry in enumerate(HISTORY):
@@ -338,7 +347,6 @@ class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
         def on_highlighted(idx):
             window = sublime.active_window()
             update_output_panel(window, show=HISTORY[idx], make_visible=True)
-            return
 
         def on_done(idx):
             sublime.active_window().destroy_output_panel('clipboard_manager')
@@ -355,9 +363,43 @@ class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
             sublime.status_message('Nothing in history')
 
 
+class ClipboardManagerChooseAndPasteRegister(sublime_plugin.TextCommand):
+    def run(self, edit):
+        def format(key, line):
+            return '{}: {}'.format(key, line.replace('\n', '↩︎')[:MAX_PANEL_LENGTH])
+
+        lines = []
+        # map the selection index to the key in HISTORY.registers
+        line_map = {}
+        keys = list(HISTORY.registers.keys())
+        keys.sort()
+        for key in keys:
+            line = HISTORY.registers[key].item
+            line_map[len(lines)] = key
+            lines.append(format(key, line))
+
+        def on_highlighted(idx):
+            key = keys[idx]
+            window = sublime.active_window()
+            update_output_panel(window, show=HISTORY.registers[key], make_visible=True)
+
+        def on_done(idx):
+            sublime.active_window().destroy_output_panel('clipboard_manager')
+            if idx == -1:
+                return
+            key = line_map[idx]
+            self.view.run_command('clipboard_manager_copy_from_register', {'register': key})
+
+        if lines:
+            on_highlighted(0)
+            sublime.active_window().show_quick_panel(lines, on_done, 0, 0, on_highlighted)
+        else:
+            sublime.status_message('Nothing in history')
+
+
 class ClipboardManagerEventListener(sublime_plugin.EventListener):
     def on_activated(self, view):
-        append_clipboard(view.settings().get('syntax'))
+        append_current_clipboard(view.settings().get('syntax'))
 
 
 class ClipboardManagerDummy(sublime_plugin.TextCommand):

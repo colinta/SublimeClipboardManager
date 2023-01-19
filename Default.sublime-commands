@@ -40,6 +40,10 @@
         "command": "clipboard_manager_copy_to_register"
     },
     {
+        "caption": "Clipboard Manager: Choose & Paste from Register",
+        "command": "clipboard_manager_choose_and_paste_register"
+    },
+    {
         "caption": "Clipboard Manager: Show Registers",
         "command": "clipboard_manager_show_registers"
     }

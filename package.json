@@ -7,10 +7,6 @@
   "labels": ["clipboard"],
   "releases": [
     {
-      "details": "https://github.com/colinta/SublimeClipboardManager/tree/st2",
-      "sublime_text": "<3000"
-    },
-    {
       "details": "https://github.com/colinta/SublimeClipboardManager/tags",
       "sublime_text": ">=3000"
     }
