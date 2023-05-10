@@ -8,7 +8,7 @@ HISTORY = None
 MAX_PANEL_LENGTH = 100
 PLAIN_SYNTAX = 'Packages/Text/Plain text.tmLanguage'
 
-current_panel_showing = None
+PANEL_SHOWING = None
 SHOW_ALL='all'
 SHOW_REGISTERS='registers'
 SHOW_CURRENT='current'
@@ -87,7 +87,7 @@ class HistoryList(list):
 
         count = str(len(self.registers))
         ret = ""
-        ret += " CLIPBOARD REGISTERS (%d)\n" % count
+        ret += " CLIPBOARD REGISTERS (%s)\n" % count
         ret += "=====================%s==\n" % ("=" * len(count))
         keys = list(self.registers.keys())
         keys.sort()
@@ -205,21 +205,21 @@ def update_output_panel(window, show=None, make_visible=False):
     if not panel.window():
         return
 
-    global current_panel_showing
-    show = show or current_panel_showing
+    global PANEL_SHOWING
+    show = show or PANEL_SHOWING
     if show == SHOW_REGISTERS:
-        current_panel_showing = SHOW_REGISTERS
+        PANEL_SHOWING = SHOW_REGISTERS
         content = HISTORY.show_registers(panel)
     elif show == SHOW_ALL:
-        current_panel_showing = SHOW_ALL
+        PANEL_SHOWING = SHOW_ALL
         content = HISTORY.show_all(panel)
     elif isinstance(show, HistoryEntry):
         content = HISTORY.show(show, panel)
     else:
-        current_panel_showing = SHOW_CURRENT
+        PANEL_SHOWING = SHOW_CURRENT
         content = HISTORY.show_current(panel)
 
-    panel.run_command('clipboard_manager_dummy', {'content': content })
+    panel.run_command('clipboard_manager_set_panel_content', {'content': content })
 
 
 class ClipboardManagerPaste(sublime_plugin.TextCommand):
@@ -278,6 +278,7 @@ class ClipboardManagerNext(sublime_plugin.TextCommand):
         window = self.view.window()
         panel = window.find_output_panel('clipboard_manager')
         panel_visible = panel and panel.window() is not None
+        global PANEL_SHOWING
         if PANEL_SHOWING == SHOW_ALL and panel_visible:
             show = SHOW_ALL
         else:
@@ -301,6 +302,7 @@ class ClipboardManagerPrevious(sublime_plugin.TextCommand):
         window = self.view.window()
         panel = window.find_output_panel('clipboard_manager')
         panel_visible = panel and panel.window() is not None
+        global PANEL_SHOWING
         if PANEL_SHOWING == SHOW_ALL and panel_visible:
             show = SHOW_ALL
         else:
@@ -402,7 +404,7 @@ class ClipboardManagerEventListener(sublime_plugin.EventListener):
         append_current_clipboard(view.settings().get('syntax'))
 
 
-class ClipboardManagerDummy(sublime_plugin.TextCommand):
+class ClipboardManagerSetPanelContent(sublime_plugin.TextCommand):
     def run(self, edit, content):
         region = sublime.Region(0, self.view.size())
         self.view.replace(edit, region, '')
