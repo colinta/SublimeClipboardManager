@@ -112,6 +112,7 @@ class HistoryList(list):
         status = content.replace("\t", "\\t") \
                         .replace("\n", "\\n") \
                         .replace("\r", "\\r")
+        self.view.show_popup('Set Clipboard Register "{0}"'.format(register))
         sublime.status_message('Set Clipboard Register "{0}" to "{1}"'.format(register, status))
 
     def append(self, item, syntax=None):
@@ -362,7 +363,7 @@ class ClipboardManagerChooseAndPaste(sublime_plugin.TextCommand):
             on_highlighted(0)
             sublime.active_window().show_quick_panel(lines, on_done, 0, 0, on_highlighted)
         else:
-            sublime.status_message('Nothing in history')
+            self.view.show_popup('Nothing in history')
 
 
 class ClipboardManagerChooseAndPasteRegister(sublime_plugin.TextCommand):
@@ -396,7 +397,7 @@ class ClipboardManagerChooseAndPasteRegister(sublime_plugin.TextCommand):
             on_highlighted(0)
             sublime.active_window().show_quick_panel(lines, on_done, 0, 0, on_highlighted)
         else:
-            sublime.status_message('Nothing in history')
+            self.view.show_popup('Nothing in history')
 
 
 class ClipboardManagerEventListener(sublime_plugin.EventListener):
